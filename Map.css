@@ -1,0 +1,28 @@
+#map_main{
+    width:60%;
+    margin:auto;
+}
+
+.Row{
+}
+.cell{
+    border:1px solid #eee;
+    height:0;
+    box-sizing:border-box;
+    display:inline-block;
+}
+.Left{
+    border-left:1px solid #000;
+}
+.Right{
+    border-right:1px solid #000;
+}
+.Top{
+    border-top:1px solid #000;
+}
+.Bottom{
+    border-bottom:1px solid #000;
+}
+.Painted{
+    background-color:#a9f0a9
+}
