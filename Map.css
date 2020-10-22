@@ -44,12 +44,12 @@
     background-color:#a9f0a9
 }
 
-.icon{
+.tool{
     width:60px;
     height:60px;
     display:inline-block;
 }
-.icon img{
+.tool img{
     width:100%;
 }
 
