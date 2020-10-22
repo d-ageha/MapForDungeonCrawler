@@ -25,6 +25,7 @@
     border:1px solid #eee;
     display:inline-block;
     box-sizing:border-box;
+    background-size:cover;
 }
 .Left{
     border-left:2px solid #000;
@@ -42,3 +43,23 @@
 .Painted{
     background-color:#a9f0a9
 }
+
+.icon{
+    width:60px;
+    height:60px;
+    display:inline-block;
+}
+.icon img{
+    width:100%;
+}
+
+.UpStair{
+    background-image:url("./assets/UpStair.png")
+}
+.DownStair{
+    background-image:url("./assets/DownStair.png")
+}
+.Door{
+    background-image:url("./assets/Door.png")
+}
+
