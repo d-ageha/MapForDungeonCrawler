@@ -1,27 +1,43 @@
-#map_main{
-    width:60%;
-    margin:auto;
-}
-
-.Row{
-}
-.cell{
-    border:1px solid #eee;
-    height:0;
-    box-sizing:border-box;
+#tools{
+    width:100%;
     display:inline-block;
 }
+
+
+#icons{
+    width:100%;
+    display:inline-block;
+}
+#utility{
+    width:35%;
+    display:inline-block;
+    vertical-align:top;
+    padding:10px;
+}
+#map_main{
+    width:60%;
+    display:inline-block;
+    vertical-align:top;
+    margin-top:20px;
+}
+
+.cell{
+    border:1px solid #eee;
+    display:inline-block;
+    box-sizing:border-box;
+}
 .Left{
-    border-left:1px solid #000;
+    border-left:2px solid #000;
+    width:
 }
 .Right{
-    border-right:1px solid #000;
+    border-right:2px solid #000;
 }
 .Top{
-    border-top:1px solid #000;
+    border-top:2px solid #000;
 }
 .Bottom{
-    border-bottom:1px solid #000;
+    border-bottom:2px solid #000;
 }
 .Painted{
     background-color:#a9f0a9
