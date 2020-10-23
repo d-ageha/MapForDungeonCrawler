@@ -1,6 +1,6 @@
-var Map=function(){
-    this.mapwidth=30
-    this.mapheight=30
+function MapForDungeonCrawler(w,h){
+    this.mapwidth=w
+    this.mapheight=h
 
     //Map Datas
     this.RowWalls=Array(mapwidth)
@@ -12,15 +12,23 @@ var Map=function(){
     this.IconUsing=0;
     this.IconClassNames=["","UpStair","DownStair","Door"]
     
-    for(i=0;i<mapwidth;i++){
-	RowWalls[i]=Array(mapheight+1).fill(0)
-	ColWalls[i]=Array(mapheight).fill(0)
-	PlacedFloor[i]=Array(mapheight).fill(0)
-	PlacedIcon[i]=Array(mapheight).fill(0)
-	PlacedMemo[i]=Array(mapheight).fill(0)
-    }
-    ColWalls[mapwidth]=Array(mapheight).fill(0)
 
+    this.InitMapDatas=function(){
+	RowWalls=Array(mapwidth)
+	ColWalls=Array(mapwidth+1)
+	PlacedFloor=Array(mapwidth)
+	PlacedIcon=Array(mapwidth)
+	PlacedMemo=Array(mapwidth)
+	for(i=0;i<mapwidth;i++){
+	    RowWalls[i]=Array(mapheight+1).fill(0)
+	    ColWalls[i]=Array(mapheight).fill(0)
+	    PlacedFloor[i]=Array(mapheight).fill(0)
+	    PlacedIcon[i]=Array(mapheight).fill(0)
+	    PlacedMemo[i]=Array(mapheight).fill(0)
+	}
+	ColWalls[mapwidth]=Array(mapheight).fill(0)
+    }
+    
     this.ChangeCellSize=function(){
 	//set css
 	console.log("Changing Cell Size")
@@ -49,11 +57,11 @@ var Map=function(){
     
     // Brush functions
     this.UseBrush=function(Cell){
-	Cell.addClass("Painted")
 	var index=parseInt(Cell.attr("id"))
 	var y=Math.floor(index/mapwidth)
 	var x=index-y*mapwidth
 	PlacedFloor[x][y]=1
+	Cell.addClass("Painted")
     }
     this.BindBrush=function(){
 	$(".cell").each(function(){
@@ -88,7 +96,16 @@ var Map=function(){
 	    $(this).unbind("click")
 	})
     }
-    
+
+    this.UpdateFloor=function(x,y){
+	if(PlacedFloor[x][y]!=0){
+	    $("#"+(x+y*mapwidth)+"_cell").addClass("Painted")
+	}
+	else if(PlacedFloor[x][y]==0){
+	    $("#"+(x+y*mapwidth)+"_cell").removeClass("Painted")
+	}
+    }
+
     // Pencil function
     this.UsePencil=function(MapMain){
 	x=event.pageX-MapMain.offset().left
@@ -208,10 +225,16 @@ var Map=function(){
 	    }
 	}
 	else{
-	    console.log(IconClassNames[IconUsing])
 	    Cell.addClass(IconClassNames[IconUsing])
 	}
     }
+    
+    this.UpdateIcon=function(x,y){
+	if(PlacedIcon[x][y]!=0){
+	    $("#"+(x+y*mapwidth)+"_cell").addClass(IconClassNames[PlacedIcon[x][y]])
+	}
+    }
+
     this.BindIcon=function(icon){
 	IconUsing=icon
 	$(".cell").each(function(){
@@ -225,9 +248,100 @@ var Map=function(){
 	    $(this).unbind("click")
 	})
     }
+
+    this.ParseAndUpdateData=function(Data){
+	Data=Data.split(",")
+	mapwidth=parseInt(Data.shift())
+	mapheight=parseInt(Data.shift())
+	InitMapDatas()
+	console.log(RowWalls)
+	for(i=0;i<RowWalls.length;i++){
+	    for(j=0;j<RowWalls[0].length;j++){
+		RowWalls[i][j]=parseInt(Data.shift())
+	    }
+	}
+	for(i=0;i<ColWalls.length;i++){
+	    for(j=0;j<ColWalls[0].length;j++){
+		ColWalls[i][j]=parseInt(Data.shift())
+	    }
+	}
+	for(i=0;i<PlacedFloor.length;i++){
+	    for(j=0;j<PlacedFloor[0].length;j++){
+		PlacedFloor[i][j]=parseInt(Data.shift())
+	    }
+	}
+	for(i=0;i<PlacedIcon.length;i++){
+	    for(j=0;j<PlacedIcon[0].length;j++){
+		PlacedIcon[i][j]=parseInt(Data.shift())
+	    }
+	}
+    }
+    
+    this.LoadData=function(){
+	$("<div class='Curtain'></div>").appendTo($("body"))
+	$("<div id='InputWindow' class='Window'></div>").text("Copy and paste your data here.")
+					.appendTo($("body"))
+	$("<form id='InputForm' action=''></form>").appendTo($("#InputWindow"))
+	$("<textarea type='text' class='Data' id='InputData' name='data'>").appendTo($("#InputForm"))
+	$("<button type='submit' id='SubmitData'>Submit</button>").appendTo($("#InputForm"))
+	$("<button type='button'>Close</button>")
+					.click(function(){
+					    $("#InputWindow").remove()
+					    $(".Curtain").remove()
+					})
+					.appendTo($("#InputForm"))
+	$("#InputForm").submit(function(event){
+	    event.preventDefault()
+	    var Data=$("#InputData").val()
+	    $("#InputWindow").remove()
+	    $(".Curtain").remove()
+	    $(".cell").remove()
+	    ParseAndUpdateData(Data)
+	    CreateCells()
+	    UpdateWholeMap()
+	})
+    }
+    
+    this.ExportData=function(){
+	var data=""
+	data+=mapwidth+","+mapheight
+	for(i=0;i<RowWalls.length;i++){
+	    for(j=0;j<RowWalls[0].length;j++ ){
+		data+=","+RowWalls[i][j]
+	    }
+	}
+	for(i=0;i<ColWalls.length;i++){
+	    for(j=0;j<ColWalls[0].length;j++ ){
+		data+=","+ColWalls[i][j]
+	    }
+	}
+	for(i=0;i<PlacedFloor.length;i++){
+	    for(j=0;j<PlacedFloor[0].length;j++ ){
+		data+=","+PlacedFloor[i][j]
+	    }
+	}
+	for(i=0;i<PlacedIcon.length;i++){
+	    for(j=0;j<PlacedIcon[0].length;j++ ){
+		data+=","+PlacedIcon[i][j]
+	    }
+	}	
+
+	$("<div class='Curtain'></div>").appendTo($("body"))
+	$("<div id='ExportWindow' class='Window'></div>")
+					.text("Copy and paste this to your local file.")
+					.appendTo($("body"))
+	$("<div class='Data'></div>").text(data).appendTo($("#ExportWindow"))
+	$("<button type='button'>Close</button>")
+					.click(function(){
+					    $("#ExportWindow").remove()
+					    $(".Curtain").remove()
+					})
+					.appendTo($("#ExportWindow"))
+    }
     
     this.Init=function(){
 	console.log("Map:Init")
+	InitMapDatas()
 	CreateCells()
 	BindBrush()
 	$("#pencil").click(function(){
@@ -252,6 +366,9 @@ var Map=function(){
 		BindIcon(index)
 	    })
 	})
+	$("#Load").click(LoadData)
+	$("#Export").click(ExportData)
+	
     }
     
     //Updates whole map
@@ -265,14 +382,20 @@ var Map=function(){
 		UpdateRowWall(i,j)
 	    }
 	}
-	
 	for(i=0;i<colx;i++){
 	    for(j=0;j<coly;j++){
 		UpdateColumnWall(i,j)
+	    }
+	}
+	for(i=0;i<mapwidth;i++){
+	    for(j=0;j<mapheight;j++){
+		UpdateFloor(i,j)
+		UpdateIcon(i,j)
 	    }
 	}
     }
     return this
 }
 
-Map().Init()
+var Map=MapForDungeonCrawler(30,30)
+Map.Init()
