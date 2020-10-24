@@ -1,4 +1,5 @@
 # MapForDungeonCrawler
+![alt text](assets/MFDC.png "Logo")
 When you were playing dugeon crawler games (eg. Wizardry, The Portopia Serial Murder Case),
 graph paper and pencil were your best friends. Today, this program takes their place.
 
