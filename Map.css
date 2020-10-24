@@ -33,6 +33,12 @@
     display:inline-block;
     box-sizing:border-box;
     background-size:cover;
+    user-drag: none; 
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
 }
 .Left{
     border-left:2px solid #000;
@@ -59,7 +65,9 @@
 .tool img{
     width:100%;
 }
-
+.selected{
+    background-color:#ffa1a0
+}
 .UpStair{
     background-image:url("./assets/UpStair.png")
 }

@@ -8,8 +8,6 @@ MapForDungeonCrawler (MFDC) is a Javascript project which helps you make 2d maps
 MFDC is inspired by Etrian Odyssey series, which features map making system.
 So, if you are familiar to EO, you can expect what to come from MFDC.
 
-Currently, you cannot save the map you wrote.
-
 ## Planned Features
 I'm going to add these features in the future:
 * Save/Load Map option

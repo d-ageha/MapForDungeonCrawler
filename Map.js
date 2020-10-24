@@ -11,7 +11,9 @@ function MapForDungeonCrawler(w,h){
 
     this.IconUsing=0;
     this.IconClassNames=["","UpStair","DownStair","Door"]
-    
+
+    this.prevX=0
+    this.prevY=0
 
     this.InitMapDatas=function(){
 	RowWalls=Array(mapwidth)
@@ -45,64 +47,64 @@ function MapForDungeonCrawler(w,h){
 	$(window).resize(ChangeCellSize)
     }
 
-    
-    this.UnbindPreviousTool=function(){
-	//Hay, just unbind everything.
-	UnbindPencil()
-	UnbindBrush()
-	UnbindEraser()
-	UnbindWiper()
-	UnbindIcon()
-    }
-    
-    // Brush functions
-    this.UseBrush=function(Cell){
-	var index=parseInt(Cell.attr("id"))
-	var y=Math.floor(index/mapwidth)
-	var x=index-y*mapwidth
-	PlacedFloor[x][y]=1
-	Cell.addClass("Painted")
-    }
-    this.BindBrush=function(){
-	$(".cell").each(function(){
-	    $(this).click(function(){
-		UseBrush($(this))
-	    })
-	})
-    }
-    this.UnbindBrush=function(Cell){
-	$(".cell").each(function(){
-	    $(this).unbind("click")
-	})
-    }
-    
-    // Wiper functions
-    this.UseWiper=function(Cell){
-	Cell.removeClass("Painted")
-	var index=parseInt(Cell.attr("id"))
-	var y=Math.floor(index/mapwidth)
-	var x=index-y*mapwidth
-	PlacedFloor[x][y]=0
-    }
-    this.BindWiper=function(){
-	$(".cell").each(function(){
-	    $(this).click(function(){
-		UseWiper($(this))
-	    })
-	})
-    }
-    this.UnbindWiper=function(Cell){
-	$(".cell").each(function(){
-	    $(this).unbind("click")
+
+    this.UnbindTool=function(){
+	$("#map_main").each(function(){
+	    $(this).unbind("mousedown").unbind("click")
 	})
     }
 
-    this.UpdateFloor=function(x,y){
-	if(PlacedFloor[x][y]!=0){
-	    $("#"+(x+y*mapwidth)+"_cell").addClass("Painted")
+    this.UnbindPreviousTool=function(){
+	//Hay, just unbind everything.
+	$(".tool").removeClass("selected")
+	UnbindTool()
+	UnbindIcon()
+    }
+    
+    this.BindTool=function(func){
+	$("#map_main").mousedown(function(event){
+	    $(this).mousemove(function(event){func($(this))})
+	    $(this).mouseup(function(){$(this).unbind("mousemove")})
+	}).click(function(event){func($(this))})
+    }
+    
+    // Brush functions
+    this.UseBrush=function(MapMain){
+	x=event.pageX-MapMain.offset().left
+	y=event.pageY-MapMain.offset().top
+	cellsize=$(".cell").outerWidth()
+	pointX=x/cellsize
+	pointY=y/cellsize
+	candidateX=Math.floor(pointX)
+	candidateY=Math.floor(pointY)
+	CenterX=candidateX+0.5
+	CenterY=candidateY+0.5
+	console.log(pointX,pointY)
+	thresholdX=0.3
+	thresholdY=0.3
+	if(Math.abs(pointX-CenterX)<thresholdX && Math.abs(pointY-CenterY)<thresholdY){
+	    PlacedFloor[candidateX][candidateY]=1
+	    UpdateFloor(candidateX,candidateY)
 	}
-	else if(PlacedFloor[x][y]==0){
-	    $("#"+(x+y*mapwidth)+"_cell").removeClass("Painted")
+    }
+    
+    // Wiper functions
+    this.UseWiper=function(MapMain){
+	x=event.pageX-MapMain.offset().left
+	y=event.pageY-MapMain.offset().top
+	cellsize=$(".cell").outerWidth()
+	pointX=x/cellsize
+	pointY=y/cellsize
+	candidateX=Math.floor(pointX)
+	candidateY=Math.floor(pointY)
+	CenterX=candidateX+0.5
+	CenterY=candidateY+0.5
+	console.log(pointX,pointY)
+	thresholdX=0.3
+	thresholdY=0.3
+	if(Math.abs(pointX-CenterX)<thresholdX && Math.abs(pointY-CenterY)<thresholdY){
+	    PlacedFloor[candidateX][candidateY]=0
+	    UpdateFloor(candidateX,candidateY)
 	}
     }
 
@@ -115,26 +117,39 @@ function MapForDungeonCrawler(w,h){
 	pointY=y/cellsize
 	candidateX=Math.round(pointX)
 	candidateY=Math.round(pointY)
-	threshold=0.2
-	
-	if(Math.abs(pointX-candidateX)<threshold){
-	    console.log("Drawn Column",candidateX,candidateY,pointX,pointY)
-	    ColWalls[candidateX][Math.floor(pointY)]=1
-	    UpdateColumnWall(candidateX,Math.floor(pointY))
+	thresholdX=0.2
+	thresholdY=0.2
+	var moveflug=0
+	if(Math.abs(pointX-candidateX)<thresholdX){
+	    if(event.type=="mousemove"){
+		if(Math.abs(x-prevX)<Math.abs(y-prevY)){
+		    moveflug=1
+		}
+	    }
+	    else{
+		moveflug=1
+	    }
+	    if(moveflug==1){
+		ColWalls[candidateX][Math.floor(pointY)]=1
+		UpdateColumnWall(candidateX,Math.floor(pointY))
+	    }
 	}
-	else if(Math.abs(pointY-candidateY)<threshold){
-	    console.log("Drawn Row",candidateX,candidateY,pointX,pointY)
-	    RowWalls[Math.floor(pointX)][candidateY]=1
-	    UpdateRowWall(Math.floor(pointX),candidateY)
+	else if(Math.abs(pointY-candidateY)<thresholdY){
+	    if(event.type=="mousemove"){
+		if(Math.abs(x-prevX)>Math.abs(y-prevY)){
+		    moveflug=1
+		}
+	    }
+	    else{
+		moveflug=1
+	    }
+	    if(moveflug==1){
+		RowWalls[Math.floor(pointX)][candidateY]=1
+		UpdateRowWall(Math.floor(pointX),candidateY)
+	    }
 	}
-    }
-    this.BindPencil=function(){
-	$("#map_main").click(function(event){
-	    UsePencil($(this))
-	})
-    }
-    this.UnbindPencil=function(){
-	$("#map_main").unbind("click")
+	prevX=x
+	prevY=y
     }
 
     // Eraser function
@@ -159,17 +174,46 @@ function MapForDungeonCrawler(w,h){
 	    UpdateRowWall(Math.floor(pointX),candidateY)
 	}
     }
-    this.BindEraser=function(){
-	$("#map_main").click(function(event){
-	    UseEraser($(this))
+
+    //Icon Functions
+    this.UseIcon=function(Cell){
+	var index=parseInt(Cell.attr("id"))
+	var y=Math.floor(index/mapwidth)
+	var x=index-y*mapwidth
+	PlacedIcon[x][y]=IconUsing
+	if(IconUsing==0){
+	    for(i=1;i<IconClassNames.length;i++){
+		Cell.removeClass(IconClassNames[i])
+	    }
+	}
+	else{
+	    Cell.addClass(IconClassNames[IconUsing])
+	}
+    }
+    this.BindIcon=function(icon){
+	IconUsing=icon
+	$(".cell").each(function(){
+	    $(this).click(function(){
+		UseIcon($(this))
+	    })
 	})
     }
-    this.UnbindEraser=function(){
-	$("#map_main").unbind("click")
+    this.UnbindIcon=function(Cell){
+	$(".cell").each(function(){
+	    $(this).unbind("click")
+	})
     }
 
-    //Updates column wall
-    function UpdateColumnWall(i,j){
+    //Updates functions
+    this.UpdateFloor=function(x,y){
+	if(PlacedFloor[x][y]!=0){
+	    $("#"+(x+y*mapwidth)+"_cell").addClass("Painted")
+	}
+	else if(PlacedFloor[x][y]==0){
+	    $("#"+(x+y*mapwidth)+"_cell").removeClass("Painted")
+	}
+    }
+    this.UpdateColumnWall=function(i,j){
 	var colx=ColWalls.length
 	var coly=ColWalls[0].length
 	var Cells=$(".Cell")	
@@ -191,7 +235,7 @@ function MapForDungeonCrawler(w,h){
 	}
     }
     
-    function UpdateRowWall(i,j){
+    this.UpdateRowWall=function(i,j){
 	var rowx=RowWalls.length
 	var rowy=RowWalls[0].length
 	var Cells=$(".Cell")	
@@ -212,43 +256,13 @@ function MapForDungeonCrawler(w,h){
 	    }
 	}
     }
-    
-    //Icon Functions
-    this.UseIcon=function(Cell){
-	var index=parseInt(Cell.attr("id"))
-	var y=Math.floor(index/mapwidth)
-	var x=index-y*mapwidth
-	PlacedIcon[x][y]=IconUsing
-	if(IconUsing==0){
-	    for(i=1;i<IconClassNames.length;i++){
-		Cell.removeClass(IconClassNames[i])
-	    }
-	}
-	else{
-	    Cell.addClass(IconClassNames[IconUsing])
-	}
-    }
-    
     this.UpdateIcon=function(x,y){
 	if(PlacedIcon[x][y]!=0){
 	    $("#"+(x+y*mapwidth)+"_cell").addClass(IconClassNames[PlacedIcon[x][y]])
 	}
     }
 
-    this.BindIcon=function(icon){
-	IconUsing=icon
-	$(".cell").each(function(){
-	    $(this).click(function(){
-		UseIcon($(this))
-	    })
-	})
-    }
-    this.UnbindIcon=function(Cell){
-	$(".cell").each(function(){
-	    $(this).unbind("click")
-	})
-    }
-
+    
     this.ParseAndUpdateData=function(Data){
 	Data=Data.split(",")
 	mapwidth=parseInt(Data.shift())
@@ -343,26 +357,32 @@ function MapForDungeonCrawler(w,h){
 	console.log("Map:Init")
 	InitMapDatas()
 	CreateCells()
-	BindBrush()
+	$("#brush").addClass("selected")
+	BindTool(UseBrush)
 	$("#pencil").click(function(){
 	    UnbindPreviousTool()
-	    BindPencil()
+	    $(this).addClass("selected")
+	    BindTool(UsePencil)
 	})
 	$("#brush").click(function(){
 	    UnbindPreviousTool()
-	    BindBrush()
+	    $(this).addClass("selected")
+	    BindTool(UseBrush)
 	})
 	$("#wiper").click(function(){
 	    UnbindPreviousTool()
-	    BindWiper()
+	    $(this).addClass("selected")
+	    BindTool(UseWiper)
 	})
 	$("#eraser").click(function(){
 	    UnbindPreviousTool()
-	    BindEraser()
+	    $(this).addClass("selected")
+	    BindTool(UseEraser)
 	})
 	$(".icon").each(function(index){
 	    $(this).click(function(){
 		UnbindPreviousTool()
+		$(this).addClass("selected")
 		BindIcon(index)
 	    })
 	})
