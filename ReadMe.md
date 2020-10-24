@@ -11,8 +11,8 @@ So, if you are familiar to EO, you can expect what to come from MFDC.
 
 ## Planned Features
 I'm going to add these features in the future:
-* Save/Load Map option
-* Export Map data for game creators
+* Undo/Redo
+* Notes on Map
 
 
 ## How to Use
