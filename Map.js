@@ -316,6 +316,7 @@ function MapForDungeonCrawler(w,h){
 	    $("#InputWindow").remove()
 	    $(".Curtain").remove()
 	    $(".cell").remove()
+	    $("#map_main>br").remove()
 	    ParseAndUpdateData(Data)
 	    CreateCells()
 	    UpdateWholeMap()
