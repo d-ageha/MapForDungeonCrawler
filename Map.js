@@ -35,13 +35,17 @@ function MapForDungeonCrawler(w,h){
 	//set css
 	console.log("Changing Cell Size")
 	width=$("#map_main").width()
-	$(".cell").css({"width":width/mapwidth+"px","height":width/mapwidth+"px"})
+	$(".cell").css({"width":width/mapwidth-1+"px","height":width/mapwidth-1+"px"})
     }
     
     this.CreateCells=function(){
 	//create map elements
-	for(i=0;i<mapheight*mapwidth;i++){
-	    $("<div></div>").addClass("cell").attr("id",i+"_cell").appendTo($("#map_main"))
+	for(i=0;i<mapwidth;i++){
+	    for(j=0;j<mapheight;j++){
+		$("<div></div>").addClass("cell").attr("id",j+i*mapwidth+"_cell")
+				.appendTo($("#map_main"))
+	    }
+	    $("<br/>").appendTo($("#map_main"))
 	}
 	ChangeCellSize()
 	$(window).resize(ChangeCellSize)
@@ -79,7 +83,7 @@ function MapForDungeonCrawler(w,h){
 	candidateY=Math.floor(pointY)
 	CenterX=candidateX+0.5
 	CenterY=candidateY+0.5
-	console.log(pointX,pointY)
+	console.log(x,y,pointX,pointY)
 	thresholdX=0.3
 	thresholdY=0.3
 	if(Math.abs(pointX-CenterX)<thresholdX && Math.abs(pointY-CenterY)<thresholdY){
