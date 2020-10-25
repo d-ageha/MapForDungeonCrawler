@@ -123,8 +123,10 @@ function MapForDungeonCrawler(w,h){
 	candidateY=Math.round(pointY)
 	thresholdX=0.2
 	thresholdY=0.2
+	centerX=candidateX+0.5
+	centerY=candidateY+0.5
 	var moveflug=0
-	if(Math.abs(pointX-candidateX)<thresholdX){
+	if(Math.abs(pointX-candidateX)<thresholdX && Math.abs(pointY-centerY)<thresholdY){
 	    if(event.type=="mousemove"){
 		if(Math.abs(x-prevX)<Math.abs(y-prevY)){
 		    moveflug=1
@@ -138,7 +140,7 @@ function MapForDungeonCrawler(w,h){
 		UpdateColumnWall(candidateX,Math.floor(pointY))
 	    }
 	}
-	else if(Math.abs(pointY-candidateY)<thresholdY){
+	else if(Math.abs(pointY-candidateY)<thresholdY && Math.abs(pointX-centerX)<thresholdX){
 	    if(event.type=="mousemove"){
 		if(Math.abs(x-prevX)>Math.abs(y-prevY)){
 		    moveflug=1
