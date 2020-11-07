@@ -270,29 +270,32 @@ function MapForDungeonCrawler(w,h){
 
     
     this.ParseAndUpdateData=function(Data){
-	Data=Data.split(",")
-	mapwidth=parseInt(Data.shift())
-	mapheight=parseInt(Data.shift())
+	Lines=Data.split('\n')
+	console.log(Lines);
+	for(i=0;i<Lines.length;i++){
+	    Lines[i]=Lines[i].split(',')
+	}
+	mapwidth=parseInt(Lines[0].shift())
+	mapheight=parseInt(Lines[0].shift())
 	InitMapDatas()
-	console.log(RowWalls)
 	for(i=0;i<RowWalls.length;i++){
 	    for(j=0;j<RowWalls[0].length;j++){
-		RowWalls[i][j]=parseInt(Data.shift())
+		RowWalls[i][j]=parseInt(Lines[1].shift())
 	    }
 	}
 	for(i=0;i<ColWalls.length;i++){
 	    for(j=0;j<ColWalls[0].length;j++){
-		ColWalls[i][j]=parseInt(Data.shift())
+		ColWalls[i][j]=parseInt(Lines[2].shift())
 	    }
 	}
 	for(i=0;i<PlacedFloor.length;i++){
 	    for(j=0;j<PlacedFloor[0].length;j++){
-		PlacedFloor[i][j]=parseInt(Data.shift())
+		PlacedFloor[i][j]=parseInt(Lines[3].shift())
 	    }
 	}
 	for(i=0;i<PlacedIcon.length;i++){
 	    for(j=0;j<PlacedIcon[0].length;j++){
-		PlacedIcon[i][j]=parseInt(Data.shift())
+		PlacedIcon[i][j]=parseInt(Lines[4].shift())
 	    }
 	}
     }
@@ -326,36 +329,49 @@ function MapForDungeonCrawler(w,h){
     this.ExportData=function(){
 	var data=""
 	data+=mapwidth+","+mapheight
+	data+="\n";
 	for(i=0;i<RowWalls.length;i++){
 	    for(j=0;j<RowWalls[0].length;j++ ){
-		data+=","+RowWalls[i][j]
+		data+=RowWalls[i][j]+","
 	    }
 	}
+	data=data.slice(0,-1);
+	data+="\n";
 	for(i=0;i<ColWalls.length;i++){
 	    for(j=0;j<ColWalls[0].length;j++ ){
-		data+=","+ColWalls[i][j]
+		data+=ColWalls[i][j]+","
 	    }
 	}
+	data=data.slice(0,-1);
+	data+="\n";
 	for(i=0;i<PlacedFloor.length;i++){
 	    for(j=0;j<PlacedFloor[0].length;j++ ){
-		data+=","+PlacedFloor[i][j]
+		data+=PlacedFloor[i][j]+","
 	    }
 	}
+	data=data.slice(0,-1);
+	data+="\n";
 	for(i=0;i<PlacedIcon.length;i++){
 	    for(j=0;j<PlacedIcon[0].length;j++ ){
-		data+=","+PlacedIcon[i][j]
+		data+=PlacedIcon[i][j]+","
 	    }
 	}	
-
+	data=data.slice(0,-1);
 	$("<div class='Curtain'></div>").appendTo($("body"))
 	$("<div id='ExportWindow' class='Window'></div>")
 					.text("Copy and paste this to your local file.")
 					.appendTo($("body"))
-	$("<div class='Data'></div>").text(data).appendTo($("#ExportWindow"))
+	$("<textarea class='Data' readonly></textarea>").val(data).appendTo($("#ExportWindow"))
 	$("<button type='button'>Close</button>")
 					.click(function(){
 					    $("#ExportWindow").remove()
 					    $(".Curtain").remove()
+					})
+					.appendTo($("#ExportWindow"))
+	$("<button type='button'>Copy</button>")
+					.click(function(){
+					    $(".Data").select()
+					    document.execCommand("copy")
 					})
 					.appendTo($("#ExportWindow"))
     }
